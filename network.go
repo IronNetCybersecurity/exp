@@ -3,20 +3,14 @@ package exp
 import "net"
 
 // Conatins IP
-
 type expContainsIp struct {
 	key, str string
+	cidrnet *net.IPNet
 }
 
 func (e expContainsIp) Eval(p Params) bool {
-  _, cidrnet, err := net.ParseCIDR(p.Get(e.key))
-  if err != nil {
-		return false
-	}
-  testIp := net.ParseIP(e.str)
-
-
-	return cidrnet.Contains(testIp)
+	testIp := net.ParseIP(p.Get(e.key))
+	return e.cidrnet.Contains(testIp)
 }
 
 
@@ -32,5 +26,9 @@ func (e expContainsIp) String() string {
 //
 // 192.168.1.0/32 will only match 192.168.1.0
 func ContainsIp(key, substr string) Exp {
-	return expContainsIp{key, substr}
+	_, cidrnet, err := net.ParseCIDR(substr)
+	if err != nil {
+		return nil
+	}
+	return expContainsIp{key, substr, cidrnet}
 }
