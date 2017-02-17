@@ -132,7 +132,6 @@ func Lte(k string, v float64) Exp {
 	return LessThanOrEqual(k, v)
 }
 
-
 // Lt
 
 type expLt struct {
@@ -162,4 +161,3 @@ func LessThan(k string, v float64) Exp {
 func Lt(k string, v float64) Exp {
 	return LessThan(k, v)
 }
-
