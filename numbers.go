@@ -43,6 +43,35 @@ func Neq(k string, v float64) Exp {
 	return Not(Eq(k, v))
 }
 
+// Gte
+type expGte struct {
+	key   string
+	value float64
+}
+
+func (gte expGte) Eval(p Params) bool {
+	value, err := strconv.ParseFloat(p.Get(gte.key), 64)
+	if err != nil {
+		return false
+	}
+	return value >= gte.value
+}
+
+func (gte expGte) String() string {
+	return sprintf("[%s≥%.2f]", gte.key, gte.value)
+}
+
+// GreaterThanOrEqual evaluates to true if the value pointed to by key is greater or equal to
+// the value of v. The value is parsed as float before performing the comparison.
+func GreaterThanOrEqual(k string, v float64) Exp {
+	return expGte{k, v}
+}
+
+// Gte is an alias for GreaterOrEqual.
+func Gte(k string, v float64) Exp {
+	return GreaterThanOrEqual(k, v)
+}
+
 // Gt
 
 type expGt struct {
@@ -62,6 +91,7 @@ func (gt expGt) String() string {
 	return sprintf("[%s>%.2f]", gt.key, gt.value)
 }
 
+
 // GreaterThan evaluates to true if the value pointed to by key is greater in
 // value than v. The value is parsed as float before performing the comparison.
 func GreaterThan(k string, v float64) Exp {
@@ -73,14 +103,33 @@ func Gt(k string, v float64) Exp {
 	return GreaterThan(k, v)
 }
 
-// GreaterOrEqual is a shorthand for Or(Gt(k, v), Eq(k, v)).
-func GreaterOrEqual(k string, v float64) Exp {
-	return Or(Gt(k, v), Eq(k, v))
+// Lte
+type expLte struct {
+	key   string
+	value float64
 }
 
-// Gte is an alias for GreaterOrEqual.
-func Gte(k string, v float64) Exp {
-	return GreaterOrEqual(k, v)
+func (lte expLte) Eval(p Params) bool {
+	value, err := strconv.ParseFloat(p.Get(lte.key), 64)
+	if err != nil {
+		return false
+	}
+	return value <= lte.value
+}
+
+func (lte expLte) String() string {
+	return sprintf("[%s≤%.2f]", lte.key, lte.value)
+}
+
+// LessThanOrEqual evaluates to true if the value pointed to by key is less or equal to
+// the value of v. The value is parsed as float before performing the comparison.
+func LessThanOrEqual(k string, v float64) Exp {
+	return expLte{k, v}
+}
+
+// Lte is an alias for LessThanOrEqual.
+func Lte(k string, v float64) Exp {
+	return LessThanOrEqual(k, v)
 }
 
 // Lt
@@ -111,14 +160,4 @@ func LessThan(k string, v float64) Exp {
 // Lt is an alias for LessThan.
 func Lt(k string, v float64) Exp {
 	return LessThan(k, v)
-}
-
-// LessOrEqual is a shorthand for Lt(Gt(k, v), Eq(k, v)).
-func LessOrEqual(k string, v float64) Exp {
-	return Or(Lt(k, v), Eq(k, v))
-}
-
-// Lte is an alias for LessOrEqual.
-func Lte(k string, v float64) Exp {
-	return LessOrEqual(k, v)
 }

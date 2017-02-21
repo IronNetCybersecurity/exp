@@ -8,6 +8,18 @@ var m = Map{
 	"baz": "booyah",
 }
 
+func TestNonMatch(t *testing.T) {
+	for key, value := range map[string]string{
+		"foo": "baz",
+		"bar": "foo",
+		"baz": "bz",
+	} {
+		if !NonMatch(key, value).Eval(m) {
+			t.Errorf("NonMatch(%q, %q) should evaluate to true", key, value)
+		}
+	}
+}
+
 func TestMatch(t *testing.T) {
 	for key, value := range map[string]string{
 		"foo": "bar",
@@ -16,6 +28,32 @@ func TestMatch(t *testing.T) {
 	} {
 		if !Match(key, value).Eval(m) {
 			t.Errorf("Match(%q, %q) should evaluate to true", key, value)
+		}
+	}
+}
+
+func TestExpStartsWith(t *testing.T) {
+	for key, substr := range map[string][]string{
+		"foo": {"b", "ba", "bar"},
+		"bar": {"b", "ba", "baz"},
+	} {
+		for _, s := range substr {
+			if !StartsWith(key, s).Eval(m) {
+				t.Errorf("StartsWith(%q, %q) should evaluate to true", key, s)
+			}
+		}
+	}
+}
+
+func TestExpEndsWith(t *testing.T) {
+	for key, substr := range map[string][]string{
+		"foo": {"r", "ar", "bar"},
+		"bar": {"z", "az", "baz"},
+	} {
+		for _, s := range substr {
+			if !EndsWith(key, s).Eval(m) {
+				t.Errorf("EndsWith(%q, %q) should evaluate to true", key, s)
+			}
 		}
 	}
 }
