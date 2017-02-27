@@ -2,6 +2,30 @@ package exp
 
 import "strings"
 
+// NonMatch
+
+type expNonMatch struct {
+	key, str string
+}
+
+func (e expNonMatch) Eval(p Params) bool {
+	return p.Get(e.key) != e.str
+}
+
+func (e expNonMatch) String() string {
+	return sprintf("[%s!=%s]", e.key, e.str)
+}
+
+// NonMatch is an expression that evaluates to true if str is NOT equal to the value
+// pointed to by key.
+//
+// 	m := Map{"foo": "bar"}
+// 	Match("foo", "foo").Eval(m) // true
+// 	Match("foo", "bar").Eval(m) // false
+func NonMatch(key, str string) Exp {
+	return expNonMatch{key, str}
+}
+
 // Match
 
 type expMatch struct {
@@ -58,6 +82,59 @@ func (e expContains) String() string {
 // value pointed to by key.
 func Contains(key, substr string) Exp {
 	return expContains{key, substr}
+}
+
+// Starts With
+
+type expStartsWith struct {
+	key, substr string
+}
+
+func (e expStartsWith) Eval(p Params) bool {
+	return strings.HasPrefix(p.Get(e.key), e.substr)
+}
+
+func (e expStartsWith) String() string {
+	return sprintf("[%s(starts_with(%s))]", e.key, e.substr)
+}
+
+// StartsWith evaluates to true if string s ends with suffix
+//
+// 	m := Map{
+// 		"foo": "bar"
+// 	}
+// 	EndsWith("foo", "b", 1).Eval(m) // true
+// 	EndsWith("foo", "ba", 1).Eval(m) // true
+// 	EndsWith("foo", "bar", 1).Eval(m) // true
+func StartsWith(key, chars string) Exp{
+	return expStartsWith{key, chars}
+}
+
+// Ends With
+
+type expEndsWith struct {
+	key, substr string
+}
+
+func (e expEndsWith) Eval(p Params) bool {
+
+	return strings.HasSuffix(p.Get(e.key), e.substr)
+}
+
+func (e expEndsWith) String() string {
+	return sprintf("[%s(ends_with(%s))]", e.key, e.substr)
+}
+
+// EndsWith evaluates to true if string s ends with suffix
+//
+// 	m := Map{
+// 		"foo": "bar"
+// 	}
+// 	EndsWith("foo", "r", 1).Eval(m) // true
+// 	EndsWith("foo", "ar", 1).Eval(m) // true
+// 	EndsWith("foo", "bar", 1).Eval(m) // true
+func EndsWith(key, chars string) Exp{
+	return expEndsWith{key, chars}
 }
 
 // ContainsAny
