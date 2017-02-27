@@ -1,5 +1,7 @@
 package exp
 
+import "strconv"
+
 // Boolean
 
 // Bool is a wrapper for the native bool type which provides an Eval function so
@@ -24,3 +26,30 @@ var (
 	// False is an expression that always evaluates to false.
 	False = Bool(false)
 )
+
+// Boolean exp that actually read the stupid field value and matches
+type expBool struct {
+	key   string
+	value bool
+}
+
+func (eq expBool) Eval(p Params) bool {
+	value, err := strconv.ParseBool(p.Get(eq.key))
+	if err != nil {
+		return false
+	}
+
+	return value == eq.value
+}
+
+func (eq expBool) String() string {
+	if eq.value {
+		return "T"
+	}
+	return "F"
+}
+
+// Boolean builds a Boolean expression
+func Boolean(k string, v bool) Exp {
+	return expBool{k, v}
+}
